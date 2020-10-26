@@ -1,0 +1,38 @@
+@charset 'utf-8';
+
+#scroll-section-0 h1 {
+	font-size: 9vw;
+}
+
+.main-message {
+    font-size: 4vw;
+}
+
+.description {
+    font-size: 2rem;
+}
+
+.description strong {
+    font-size: 6rem;
+}
+
+.scroll-section-2 .main-message {
+	font-size: 6vw;
+}
+
+.main-message small {
+    font-size: 1.5vw;
+}
+
+.desc-message {
+	width: 20%;
+	font-weight: bold;
+}
+
+.mid-message {
+    font-size: 4vw;
+}
+
+.canvas-caption {
+    font-size: 2rem;
+}
