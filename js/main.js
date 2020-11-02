@@ -4,6 +4,7 @@
 	let yOffset = 0; // window.pageYOffset 대신 쓸 변수
 	let prevScrollHeight = 0; // 현재 스크롤 위치(yOffset)보다 이전에 위치한 스크롤 섹션들의 스크롤 높이 값의 합
 	let currentScene = 0; //현재 활성화된 씬 (scroll-section)
+	let enterNewScene = false; //새로운 씬이 시작된 순간 true 
 
 	const sceneInfo = [
 		{	//0
@@ -12,13 +13,14 @@
 			scrollHeight: 0,
 			objs: {
 				container: document.querySelector('#scroll-section-0'),
-				messageA: document.querySelector('.main-message--a'),
-				messageB: document.querySelector('.main-message--b'),
-				messageC: document.querySelector('.main-message--c'),
-				messageD: document.querySelector('.main-message--d')
+				messageA: document.querySelector('#scroll-section-0 .main-message--a'),
+				messageB: document.querySelector('#scroll-section-0 .main-message--b'),
+				messageC: document.querySelector('#scroll-section-0 .main-message--c'),
+				messageD: document.querySelector('#scroll-section-0 .main-message--d')
 			},
 			values: {
-				messageA_opacity: [0, 1]				
+				messageA_opacity: [0, 1, { start : 0.1, end: 0.2 }],				
+				messageB_opacity: [0, 1, { start : 0.2, end: 0.4 }]				
 			}
 		},
 		{	//1
@@ -66,12 +68,23 @@
 		document.body.setAttribute('id', `show-scene-${currentScene}`);
 	}
 
+ // currentYOffset: 현재 씬에서 얼마나 스크롤 됐는지  
 	function calcValues(values, currentYOffset) {
 		let rv;
-		// 현재 씬에서 스크롤된 범위를 비율로 구하기
-		let scrollRatio = currentYOffset / sceneInfo[currentScene].scrollHeight;
+		// 현재 씬에서 스크롤된 범위를 0~1사이의 비율로 구하기
+		const scrollHeight = sceneInfo[currentScene].scrollHeight;
+		const scrollRatio = currentYOffset / scrollHeight;
 
-		rv = scrollRatio * (values[1] - values[0]) + values[0]; 
+		if (values.length === 3) {
+			// start ~ end 사이에 애니메이션 실행
+			const partScrollStart = values[2].start * scrollHeight;
+			const PartScrollEnd = values[2].end * scrollHeight;
+			const partScrollHeight = PartScrollEnd - partScrollStart;
+
+			rv = scrollRatio * (values[1] - values[0]) + values[0]; 
+		} else {
+			rv = scrollRatio * (values[1] - values[0]) + values[0]; 
+		}
 
 		return rv;
 	}	
@@ -80,11 +93,15 @@
 		const objs = sceneInfo[currentScene].objs;
 		const values = sceneInfo[currentScene].values;
 		const currentYOffset = yOffset - prevScrollHeight;
-                                                
+		
+		console.log(currentScene);
+
 		switch (currentScene) {
 			case 0:
 				let messageA_opacity_in = calcValues(values.messageA_opacity, currentYOffset);
 				objs.messageA.style.opacity = messageA_opacity_in;
+
+				console.log(messageA_opacity_in);
 				break;
 			case 1:
 				// console.log(2);
@@ -100,20 +117,25 @@
 	}
 
 	function scrollLoop() {
-		prevScrollHeight = 0; 
+		enterNewScene = false;
+		prevScrollHeight = 0;  
 		for (let i = 0; i < currentScene; i++){
 			prevScrollHeight += sceneInfo[i].scrollHeight;
 		}
 		
 		if (yOffset > prevScrollHeight + sceneInfo[currentScene].scrollHeight) {
+			enterNewScene = true;
 			currentScene++;
+			document.body.setAttribute('id', `show-scene-${currentScene}`);
 		}
 
 		if (yOffset < prevScrollHeight) {
+			enterNewScene = true;
 			if (currentScene === 0) return; // 브라우저 바운스 효과로 인해 마이너스가 되는 것을 방지(모바일)
 			currentScene--;
+			document.body.setAttribute('id', `show-scene-${currentScene}`);
 		}
-
+		if (enterNewScene) return;
 		playAnimation();
 	}
 
