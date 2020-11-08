@@ -19,8 +19,10 @@
 				messageD: document.querySelector('#scroll-section-0 .main-message--d')
 			},
 			values: {
-				messageA_opacity: [0, 1, { start : 0.1, end: 0.2 }],				
-				messageB_opacity: [0, 1, { start : 0.2, end: 0.4 }]				
+				messageA_opacity_in: [0, 1, { start : 0.1, end: 0.2 }],		
+				messageB_opacity_in: [0, 1, { start : 0.2, end: 0.4 }],		
+				messageA_opacity_out: [1, 0, { start : 0.25, end: 0.3 }],	
+				messageB_opacity_out: [1, 0, { start : 0.2, end: 0.4 }],				
 			}
 		},
 		{	//1
@@ -81,7 +83,13 @@
 			const PartScrollEnd = values[2].end * scrollHeight;
 			const partScrollHeight = PartScrollEnd - partScrollStart;
 
-			rv = scrollRatio * (values[1] - values[0]) + values[0]; 
+			if(currentYOffset >= partScrollStart && currentYOffset <= PartScrollEnd){
+				rv = (currentYOffset - partScrollStart) / partScrollHeight * (values[1] - values[0]) + values[0];  
+			} else if (currentYOffset < partScrollStart) {
+				values[0];  
+			} else if (currentYOffset > PartScrollEnd) {
+				values[1];  
+			}
 		} else {
 			rv = scrollRatio * (values[1] - values[0]) + values[0]; 
 		}
@@ -93,15 +101,20 @@
 		const objs = sceneInfo[currentScene].objs;
 		const values = sceneInfo[currentScene].values;
 		const currentYOffset = yOffset - prevScrollHeight;
-		
-		console.log(currentScene);
+		const scrollHeight = sceneInfo[currentScene].scrollHeight;
+		const scrollRatio = (yOffset - prevScrollHeight) / scrollHeight;
 
 		switch (currentScene) {
 			case 0:
-				let messageA_opacity_in = calcValues(values.messageA_opacity, currentYOffset);
-				objs.messageA.style.opacity = messageA_opacity_in;
+				let messageA_opacity_in = calcValues(values.messageA_opacity_in, currentYOffset);
+				let messageA_opacity_out = calcValues(values.messageA_opacity_out, currentYOffset);
+				
+				if (scrollRatio <= 0.22) {
+					objs.messageA.style.opacity = messageA_opacity_in;
+				} else {
+					objs.messageA.style.opacity = messageA_opacity_out;
+				}
 
-				console.log(messageA_opacity_in);
 				break;
 			case 1:
 				// console.log(2);
