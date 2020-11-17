@@ -86,9 +86,9 @@
 			if(currentYOffset >= partScrollStart && currentYOffset <= PartScrollEnd){
 				rv = (currentYOffset - partScrollStart) / partScrollHeight * (values[1] - values[0]) + values[0];  
 			} else if (currentYOffset < partScrollStart) {
-				values[0];  
+				rv = values[0];
 			} else if (currentYOffset > PartScrollEnd) {
-				values[1];  
+				rv = values[1]; 
 			}
 		} else {
 			rv = scrollRatio * (values[1] - values[0]) + values[0]; 
